@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.pagetitle = "Add question";
+}
+
+
+<div class="col-md-12">
+    @using (Html.BeginForm())
+    {
+    <fieldset>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Course</label>
+            @Html.DropDownList("courseId", (SelectList)ViewBag.courses, "Select course", new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Question</label>
+            <textarea cols="3" rows="3" name="question" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Option A</label>
+            <input type="text" name="optionA" class="form-control" id="exampleInputPassword1" placeholder="CS 321" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Option B</label>
+            <input type="text" name="optionB" class="form-control" id="exampleInputPassword1" placeholder="CS 321" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Option C</label>
+            <input type="text" name="optionC" class="form-control" id="exampleInputPassword1" placeholder="CS 321" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Option D</label>
+            <input type="text" name="optionD" class="form-control" id="exampleInputPassword1" placeholder="CS 321" />
+        </div>      
+        <div class="form-group">
+            <label for="exampleInputPassword1">Question Weight</label>
+            <input type="number" name="weight" class="form-control" id="exampleInputPassword1" placeholder="CS 321" />
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputPassword1">Option D</label>
+            @Html.DropDownList("correctAnswer", (SelectList)ViewBag.answers, "Select answer", new { @class = "form-control" })
+        </div>
+       
+
+        <button type="submit" class="btn btn-primary m-r-5">Save</button>
+
+    </fieldset>
+    }
+</div>

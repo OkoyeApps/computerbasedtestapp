@@ -1,0 +1,82 @@
+﻿@model List<CBT_APP.Models.Courses>
+
+@{
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.PageTitle = "Availble Courses";
+    ViewBag.Title = "All Courses";
+}
+
+
+@section css{
+    <link href="~/Scripts/assets/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Scripts/assets/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="col-md-12">
+    @*<table class="table table-striped table-responsive">
+        <tr>*@
+    
+        @Html.Partial("_AddCourse")
+        <br /><br />
+    
+           
+        @*</tr>
+        <tr>
+            <td>*@
+                <table id="data-table" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Code</th>
+                            <th>Availbility</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @for (var i = 0; i < Model.Count; i++)
+                        {
+                        <tr>
+                            <td>@{var count = i + 1;} @count</td>
+                            <td>@Model[i].name</td>
+                            <td>@Model[i].code</td>
+                            <td>@Model[i].status</td>
+                            <td>@Model[i].CreatedDate.ToLongDateString()</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            @*</td>
+        </tr>
+    </table>*@
+
+
+
+</div>
+
+@section scripts {
+    <script src="~/Scripts/assets/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="~/Scripts/assets/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Scripts/assets/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/js/table-manage-default.demo.min.js"></script>
+    <script>
+        TableManageDefault.init();
+        $('#addcourse').on('click', function (e) {
+            if ($('#crcname').val().trim() != '' && $('#crccode').val().trim() != '') {
+                $('#main').toggleClass('hidden');
+                $('#load').toggleClass('hidden');
+                $('#courseform').submit();
+            } else {
+                console.log("invalid form")
+            }
+        })
+
+        //function submitForm() {
+        //    $('#courseform').submit();
+        //}
+    </script>
+}
+
+
+

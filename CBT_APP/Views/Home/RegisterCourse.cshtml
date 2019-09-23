@@ -1,0 +1,121 @@
+﻿@model List<CBT_APP.Models.Courses>
+
+@{
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.PageTitle = "Availble Courses";
+    ViewBag.Title = "All Courses";
+}
+
+
+@section css{
+    <link href="~/Scripts/assets/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Scripts/assets/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="col-md-12">
+    @*<table class="table table-striped table-responsive">
+        <tr>*@
+
+    @Html.Partial("_preview")
+    <br /><br />
+
+    <table id="data-table" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th></th>
+                <th>Title</th>
+                <th>Code</th>
+                <th>Availbility</th>
+                <th></th>
+            </tr>x
+        </thead>
+        <tbody>
+
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>@{var count = i + 1;} @count</td>
+                    <td> <input class="checkbox" type="checkbox" id="crccheck" onclick="handleclick(@Model[i].Id)" data-id="@Model[i].Id" data-name="@Model[i].name" data-code="@Model[i].code" value="@Model[i].Id" /> </td>
+                    <td>@Model[i].name</td>
+                    <td>@Model[i].code</td>
+                    <td>@Model[i].status</td>
+                    <td>@Model[i].CreatedDate.ToLongDateString()</td>
+                </tr>
+                
+            }
+        </tbody>
+    </table>
+
+
+
+</div>
+
+@section scripts {
+    <script src="~/Scripts/assets/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="~/Scripts/assets/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Scripts/assets/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/assets/js/table-manage-default.demo.min.js"></script>
+    <script>
+        var dataToPreview = [];
+        var dataToPost = {};
+        TableManageDefault.init();
+
+        function handleclick(name) {
+            var currentElement = $(`checkbox[data-id=${name}]`).context.activeElement;
+            var dataset = currentElement.dataset;
+            if (currentElement.checked && dataToPost[currentElement.value] === undefined) {
+                //add to array of elements to post and elements to preview
+                if (dataToPreview.length <= 4) {
+                    dataToPost = { ...dataToPost, [currentElement.value]: currentElement.value };
+                    dataToPreview.push({ code: dataset.code, name: dataset.name, id: dataset.id });
+                } else {
+                    alert("you can't register more than four courses, kindly re-think your process");
+                }
+            
+            } else if (!currentElement.checked && dataToPost[currentElement.value] !== undefined) {
+                //remove from array of both to post and preview
+                delete dataToPost[currentElement.value];
+                dataToPreview = dataToPreview.filter(x =>x.id !== currentElement.value)
+            }
+        }
+
+        
+        $('#preview').on('click', function (e) {
+            console.log("clicking")
+            var tbody = $('#crctbody');
+            tbody.html('');
+            //generate Preview tbody
+            dataToPreview.map((x, index) => {
+                tbody.append(
+                    `
+                    <tr>
+                         <td>${++index}</td>
+                        <td>${x.name}</td>
+                        <td>${x.code}</td>
+                     </tr>
+                `)
+            })
+        })
+
+        $('#addcourse').on('click', function () {
+            if (dataToPreview.length === 4) {
+                var form = $('#courseform');
+                var data = Object.keys(dataToPost).map(x => x);
+                console.log('data string', data.toString());
+                form.append(
+                    `<input name="courses" value=${data.toString()} hidden type="text" />`
+                )
+                $('#courseform').submit();
+
+            } else {
+                alert('You can register only four courses for examination');
+            }
+        })
+
+
+    </script>
+}
+
+
+

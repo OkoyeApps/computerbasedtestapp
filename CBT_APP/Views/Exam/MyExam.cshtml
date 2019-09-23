@@ -1,0 +1,231 @@
+﻿@model  Dictionary<int, string>
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.pagetitle = "My Exam";
+    int count = 1;
+    var modelKeys = Model.Keys.ToArray();
+}
+
+
+
+<div class="col-md-12 hidden" id="container">
+    <input id="check" hidden value="@User.Identity.GetUserId()" />
+    <br /><br />
+    <ul class="nav nav-tabs col-md-12" style="text-align:center">
+        @foreach (var item in Model)
+        {
+            var activeclass = count == 1 ? "active" : "";
+            <li class="@activeclass"><a href="#default-tab-@count" data-toggle="tab">@item.Value</a></li>
+            count++;
+        }
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade active in" id="default-tab-1">
+            <div id="@modelKeys[0]content">
+                <br /><br />
+                <h3 style="text-align:center">Click Next to begin this Course</h3>
+            </div>
+            <div class="row" id="@modelKeys[0]ansdiv">
+            </div>
+
+            <p class="text-right m-b-0">
+                <a href="javascript:;" class="btn btn-white m-r-5" onclick="showPrevious(@modelKeys[0])">Prev</a>
+                <a href="javascript:;" class="btn btn-primary" onclick="showNext(@modelKeys[0])">Next</a>
+            </p>
+        </div>
+
+
+        <div class="tab-pane fade" id="default-tab-2">
+            <div id="@modelKeys[1]content">
+                <h3 style="text-align:center">Click Next to begin this Course</h3>
+            </div>
+            <div class="row" id="@modelKeys[1]ansdiv">
+            </div>
+            <p class="text-right m-b-0">
+                <a href="javascript:;" class="btn btn-white m-r-5" onclick="showPrevious(@modelKeys[1])">Prev</a>
+                <a href="javascript:;" class="btn btn-primary" onclick="showNext(@modelKeys[1])">Next</a>
+            </p>
+        </div>
+        <div class="tab-pane fade" id="default-tab-3">
+            <div id="@modelKeys[2]content">
+                <h3 style="text-align:center">Click Next to begin this Course</h3>
+            </div>
+            <div class="row" id="@modelKeys[2]ansdiv">
+            </div>
+            <p class="text-right m-b-0">
+                <a href="javascript:;" class="btn btn-white m-r-5" onclick="showPrevious(@modelKeys[2])">Prev</a>
+                <a href="javascript:;" class="btn btn-primary" onclick="showNext(@modelKeys[2])">Next</a>
+            </p>
+        </div>
+
+        <div class="tab-pane fade" id="default-tab-4">
+            <div id="@modelKeys[3]content">
+                <h3 style="text-align:center">Click Next to begin this Course</h3>
+            </div>
+            <div class="row" id="@modelKeys[3]ansdiv">
+            </div>
+            <p class="text-right m-b-0">
+                <a href="javascript:;" class="btn btn-white m-r-5" onclick="showPrevious(@modelKeys[3])">Prev</a>
+                <a href="javascript:;" class="btn btn-primary" onclick="showNext(@modelKeys[3])">Next</a>
+            </p>
+        </div>
+    </div>
+    <div style="text-align:center">
+        <button type="button" class="btn btn-sm btn-success" style="text-align:center" id="btnsubmit">Submit Exam</button>
+    </div>
+    <form id="examform" action="/exam/myexam" method="post">
+        <input id="qst" name="exam" hidden />
+    </form>
+
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var ExamCouresAndQuestions = {};
+            var lastExamState = {
+                currentQuestion: null,
+                lastquestion: null,
+                prevAns: null
+            }
+
+            var examAnswers = {};
+            $('#container').toggleClass('hidden')
+            var id = $('#check').val();
+            var url = '/Exam/GetExamQuestions/' + id;
+            $.ajax({
+                type: 'GET',
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    console.log(result.data);
+                    if (result.success) {
+                        ExamCouresAndQuestions = result.data;
+                    } else {
+                        //handle no exam record found
+                    }
+                },
+                failure: function (error) {
+
+                }
+            })
+
+            window.showPrevious = function showPrevious(id) {
+                var currentArray = ExamCouresAndQuestions[id];
+                if (currentArray) {
+                    var lastState = lastExamState[id];
+                    if (lastState) {
+                        var currentQuestion = currentArray[lastState.lastNo];
+                        if (currentQuestion) {
+                            updateExamState(id, lastState.lastNo);
+                            showQuestionToView(id, currentArray[lastState.lastNo], lastState.lastNo);
+                        } else {
+                            //No more question for this course
+                            //updateExamState(id, lastState.lastNo);
+                            showQuestionToView(id, null, lastState.lastNo)
+                        }
+                    } else {
+                        //var currentQuestion = currentArray[0];
+                        //showQuestionToView(id, currentQuestion);
+                        //updateExamState(id, 0);
+                    }
+                }
+
+            }
+
+            window.showNext = function showNext(id) {
+                var currentArray = ExamCouresAndQuestions[id];
+                if (currentArray) {
+                    var lastState = lastExamState[id];
+                    if (lastState) {
+                        var currentPosition = lastState.currentNo + 1;
+                        var currentQuestion = currentArray[currentPosition];
+                        if (currentQuestion) {
+                            updateExamState(id, currentPosition);
+                            showQuestionToView(id, currentArray[currentPosition], currentPosition);
+                        } else {
+                            //No more question for this course
+                            updateExamState(id, lastState.lastNo)
+                            showQuestionToView(id, null, lastState.currentNo)
+                        }
+                    } else {
+                        var currentQuestion = currentArray[0];
+                        showQuestionToView(id, currentQuestion, 0);
+                        updateExamState(id, 0);
+                    }
+                }
+
+            }
+
+            function updateExamState(id, currentNo) {
+                var resumeCourse = lastExamState[id];
+                if (resumeCourse) {
+                    lastExamState[id] = {
+                        lastNo: currentNo - 1 > 0 ? currentNo : 0,
+                        currentNo: currentNo
+                    }
+                } else {
+                    lastExamState[id] = {
+                        lastNo: 0,
+                        currentNo: currentNo
+                    }
+                }
+            }
+
+            function showQuestionToView(id, currentquestion, count) {
+                var contentid = `#${id}content`;
+                var ansId = `#${id}ansdiv`;
+                if (currentquestion) {
+                    $(`${contentid}`).html(
+                        `
+                        <br /><br />
+                        <div>  <b>${++count}</b><div class="pull-right" style="color:green"><b>Ans : 1</b></div></div>
+
+                        <br /><br />
+                        <p>${currentquestion.question}</p>
+                                        `
+                    )
+                    $(`${ansId}`).html(
+                        `
+                    <div class="col-md-3 col-sm-12"><input type="radio" name="ans" value="${id}#${currentquestion.id}" id={anscheck} onclick=selecAns(${id},${currentquestion.id},1) class="checkbox" /> ${currentquestion.optionA}</div>
+                    <div class="col-md-3 col-sm-12"><input type="radio" name="ans" value="${id}#${currentquestion.id}" onclick=selecAns(${id},${currentquestion.id},2)  class="checkbox" /> ${currentquestion.optionB}</div>
+                    <div class="col-md-3 col-sm-12"> <input type="radio" name="ans" value="${id}#${currentquestion.id}" onclick=selecAns(${id},${currentquestion.id},3)  class="checkbox" />${currentquestion.optionC} </div>
+                    <div class="col-md-3 col-sm-12"><input type="radio" name="ans" value="${id}#${currentquestion.id}" onclick=selecAns(${id},${currentquestion.id},4)  class="checkbox" />${currentquestion.optionD} </div>
+                                        `
+                    )
+                } else {
+                    $(`${ansId}`).html('')
+                    $(`${contentid}`).html(`
+                                            <br /><br />
+                                            <h3 style = "text-align:center" > No more question for course</h3 > `);
+                }
+            }
+
+            window.selecAns = function selecAns(id, qstId, ans) {
+                //using the coureseId and question id to generate unique keys for each question
+                examAnswers = {
+                    ...examAnswers, [`${id}:${qstId}`]: `${id}:${qstId}:${ans}`
+                }        
+            }
+
+
+            $('#btnsubmit').on('click', function () {
+                console.log("clicking ")
+                var result = confirm("By clicking this, you agree that you have completed your exams");
+                if (result) {
+                    var ans = Object.keys(examAnswers).map(x => examAnswers[x]);
+                    console.log("answers to submit", ans.toString());
+                    $('#qst').val(ans.toString());
+                $('#examform').submit();
+                }
+
+            })
+         
+
+        })
+
+
+    </script>
+}
