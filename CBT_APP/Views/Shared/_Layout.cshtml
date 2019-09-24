@@ -60,39 +60,63 @@
         <div id="top-menu" class="top-menu">
             <!-- begin top-menu nav -->
             <ul class="nav" style="text-align: center">
+                @if (User.Identity.Name == "admin@example.com")
+                {
+                    <li class="has-sub">
+                        <a href="@Url.Action("Index", "admin")">
+                            <b class="caret pull-right"></b>
+                            <!-- <i class="fa fa-key"></i> -->
+                            <span>All Courses</span>
+                        </a>
+
+                    </li>
+
+                    <li class="has-sub">
+                        <a href="@Url.Action("addquestion", "admin")">
+                            <b class="caret pull-right"></b>
+                            <!-- <i class="fa fa-key"></i> -->
+                            <span>Add Question</span>
+                        </a>
+
+                    </li>
+
+                    @*<li class="has-sub">
+                        <a href="@Url.Action("","")">
+                            <b class="caret pull-right"></b>
+                            
+                            <span></span>
+                        </a>
+
+                    </li>*@
+
+                }
+                else
+                {
+                    <li class="has-sub">
+                        <a href="@Url.Action("registercourse", "home")">
+                            <b class="caret pull-right"></b>
+                            <!-- <i class="fa fa-key"></i> -->
+                            <span>Register Course</span>
+                        </a>
+
+                    </li>
+                    <li class="has-sub">
+                        <a href="@Url.Action("myexam", "exam")">
+                            <b class="caret pull-right"></b>
+                            <!-- <i class="fa fa-key"></i> -->
+                            <span>Take Exam</span>
+                        </a>
+
+                    </li>
+                }
 
 
-                <li class="has-sub">
-                    <a href="javascript:;">
-                        <b class="caret pull-right"></b>
-                        <!-- <i class="fa fa-key"></i> -->
-                        <span>Register Courses</span>
-                    </a>
-
-                </li>
-                <li class="has-sub">
-                    <a href="javascript:;">
-                        <b class="caret pull-right"></b>
-                        <!-- <i class="fa fa-cubes"></i> -->
-                        <span>My Registrations <span class="label label-theme m-l-5"></span></span>
-                    </a>
-
-                </li>
-                <li class="has-sub">
-                    <a href="javascript:;">
-                        <b class="caret pull-right"></b>
-                        <!-- <i class="fa fa-medkit"></i> -->
-                        <span>Exam</span>
-                    </a>
-
-                </li>
-
-                <li class="menu-control menu-control-left">
+                @*<li class="menu-control menu-control-left">
                     <a href="#" data-click="prev-menu"><i class="fa fa-angle-left"></i></a>
                 </li>
                 <li class="menu-control menu-control-right">
                     <a href="#" data-click="next-menu"><i class="fa fa-angle-right"></i></a>
-                </li>
+                </li>*@
             </ul>
             <!-- end top-menu nav -->
         </div>
@@ -117,6 +141,15 @@
                             <h4 class="panel-title">@title</h4>
                         </div>
                         <div class="panel-body">
+                            @if (ViewBag.error != null || ViewBag.success != null)
+                            {
+                                <div class="alert alert-danger alert-dismissable" id="overload">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <span>@{string message = ViewBag.Error ?? ViewBag.success;}@message</span>
+                                </div>
+                             }
+                           
+
                             @RenderBody()
                         </div>
                     </div>
